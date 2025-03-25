@@ -1,0 +1,25 @@
+<s:Envelope xmlns:s="http://www.w3.org/2003/05/soap-envelope" xmlns:a="http://www.w3.org/2005/08/addressing">
+<s:Header>
+<a:Action s:mustUnderstand="1">http://schemas.microsoft.com/windows/pki/2009/01/enrollment/RequestSecurityTokenCertificateEnrollmentWSDetailFault</a:Action>
+<a:RelatesTo>urn:uuid:925fcd3d-c008-4caf-b390-3cd13b21f90f</a:RelatesTo>
+<ActivityId CorrelationId="9d0799d0-a193-4445-8f39-4d5617c2e071" xmlns="http://schemas.microsoft.com/2004/09/ServiceModel/Diagnostics">95427c83-902c-48db-9529-f61cc1d8c035</ActivityId>
+</s:Header>
+<s:Body>
+<s:Fault>
+<s:Code>
+<s:Value>s:Receiver</s:Value>
+</s:Code>
+<s:Reason>
+<s:Text xml:lang="en-US">Denied by Policy Module</s:Text>
+</s:Reason>
+<s:Detail>
+<CertificateEnrollmentWSDetail xmlns="http://schemas.microsoft.com/windows/pki/2009/01/enrollment" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+<BinaryResponse>VkVoV2NsbFlUV2RqTWtZMVkzbENiMkZSUFQwPQ==</BinaryResponse>
+<ErrorCode>-2146875385</ErrorCode>
+<InvalidRequest>true</InvalidRequest>
+<RequestID>368</RequestID>
+</CertificateEnrollmentWSDetail>
+</s:Detail>
+</s:Fault>
+</s:Body>
+</s:Envelope>

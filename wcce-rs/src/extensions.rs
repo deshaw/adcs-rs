@@ -1,0 +1,203 @@
+use yasna::{construct_der, models::ObjectIdentifier, DERWriter};
+
+use crate::pkcs10::Extension;
+
+/// Structs that implement this trait may be encoded as an MS-WCCE
+/// certificate extension. From [Section 2.2.2.7.7][1] of MS-WCCE:
+///
+/// > OID = 1.3.6.1.4.1.311.2.1.14.
+/// >
+/// > Internal Name: szOID_CERT_EXTENSIONS.
+/// >
+/// > Description: Provides an array of certificate extensions.
+/// >
+/// > Format: Format is specified in [RFC2985] section 5.4.2.
+/// >
+/// > This field MUST contain zero or more extensions as specified in [X509]
+/// > section 8.2.2.
+/// >
+/// > In addition, clients can pass these certificate extensions:
+/// >
+/// > 1. Certificate template information. There are two versions for
+/// >    certificate templates: V1 and V2. Certificate template specifications
+/// >    are in [MS-CRTD]. See sections 2.2.2.7.7.1 and 2.2.2.7.7.2 for
+/// >    specifics on how to encode these extensions.
+/// > 2. Certificate Application Policies. See section 2.2.2.7.7.3 for
+/// >    specifics on how to encode this extension.
+pub(crate) trait WcceExtension {
+    /// The object identifier (OID) associated with this extension.
+    const EXTENSION_OID: &'static [u64];
+
+    /// Whether or not this extension should be marked as critical.
+    const CRITICAL: bool;
+
+    /// Rules for DER-encoding the value of this extension.
+    fn value(&self, writer: DERWriter);
+}
+
+impl<T> Extension for T
+where
+    T: WcceExtension,
+{
+    fn oid(&self) -> &[u64] {
+        Self::EXTENSION_OID
+    }
+
+    fn critical(&self) -> bool {
+        Self::CRITICAL
+    }
+
+    fn value(&self) -> Vec<u8> {
+        construct_der(|writer| {
+            self.value(writer);
+        })
+    }
+}
+
+/// An extension that specifies a certificate template.
+///
+/// From [section 2.2.2.7.7.2][1] of MS-WCCE:
+///
+/// > Internal Name: szOID_CERTIFICATE_TEMPLATE.
+/// >
+/// > Description: Contains the information about the template.
+///
+/// [1]: <https://learn.microsoft.com/en-us/openspecs/windows_protocols/ms-wcce/9da866e5-9ce9-4a83-9064-0d20af8b2ccf>
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub struct CertificateTemplate<'a> {
+    /// The value of the msPKI-Cert-Template-OID attribute of a certificate
+    /// template object, as specified in [MS-CRTD] section 2.20.
+    pub template_oid: &'a [u64],
+
+    /// The value of the revision attribute of a certificate template object,
+    /// as specified in [MS-CRTD] section 2.6.
+    /// While [MS-CRTD] defines this field as optional, you may find that there
+    /// aren't many cases where it truly is.
+    /// In some scenarios, specifying the version as `0` will yield correct
+    /// behavior.
+    pub major_version: Option<u32>,
+
+    /// The value of the msPKI-Template-Minor-Revision attribute of a
+    /// certificate template object, as specified in [MS-CRTD] section 2.17.
+    /// While [MS-CRTD] defines this field as optional, you may find that there
+    /// aren't many cases where it truly is.
+    /// In some scenarios, specifying the version as `0` will yield correct
+    /// behavior.
+    pub minor_version: Option<u32>,
+}
+
+impl WcceExtension for CertificateTemplate<'_> {
+    /// From [section 2.2.2.7.7.2][1] of MS-WCCE:
+    ///
+    /// > OID = 1.3.6.1.4.1.311.21.7.
+    ///
+    /// [1]: <https://learn.microsoft.com/en-us/openspecs/windows_protocols/ms-wcce/9da866e5-9ce9-4a83-9064-0d20af8b2ccf>
+    const EXTENSION_OID: &'static [u64] = &[1, 3, 6, 1, 4, 1, 311, 21, 7];
+
+    /// From [section 2.2.2.7.7.2][1] of MS-WCCE:
+    ///
+    /// > The critical field for this extension SHOULD be set to FALSE.
+    ///
+    /// [1]: <https://learn.microsoft.com/en-us/openspecs/windows_protocols/ms-wcce/9da866e5-9ce9-4a83-9064-0d20af8b2ccf>
+    const CRITICAL: bool = false;
+
+    /// From [section 2.2.2.7.7.2][1] of MS-WCCE:
+    ///
+    /// > Format: The following is the ASN.1 format for this attribute.:
+    /// >
+    /// > ```asn1
+    /// > CertificateTemplateOID ::= SEQUENCE {
+    /// >     templateID              OBJECT IDENTIFIER,
+    /// >     templateMajorVersion    INTEGER (0..4294967295) OPTIONAL,
+    /// >     templateMinorVersion    INTEGER (0..4294967295) OPTIONAL
+    /// > } --#public
+    /// > ```
+    ///
+    /// [1]: <https://learn.microsoft.com/en-us/openspecs/windows_protocols/ms-wcce/9da866e5-9ce9-4a83-9064-0d20af8b2ccf>
+    fn value(&self, writer: DERWriter) {
+        writer.write_sequence(|writer| {
+            writer
+                .next()
+                .write_oid(&ObjectIdentifier::from_slice(self.template_oid));
+            if let Some(major) = self.major_version {
+                writer.next().write_u32(major);
+            }
+            if let Some(minor) = self.minor_version {
+                writer.next().write_u32(minor);
+            }
+        });
+    }
+}
+
+/// [`ApplicationCertPolicies`] is not defined by MS-WCCE.
+/// However, it is included in PKCS #10 certificate requests generated by the
+/// certreq command.
+///
+/// For more information, see [Object IDs associated with Microsoft
+/// cryptography][1].
+///
+/// [1]: https://web.archive.org/web/20190109071032/https://support.microsoft.com/en-us/help/287547/object-ids-associated-with-microsoft-cryptography
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct ApplicationCertPolicies<'a, T>
+where
+    T: AsRef<[u64]>,
+{
+    pub policies: &'a [T],
+}
+
+impl<T> WcceExtension for ApplicationCertPolicies<'_, T>
+where
+    T: AsRef<[u64]>,
+{
+    const EXTENSION_OID: &'static [u64] = &[1, 3, 6, 1, 4, 1, 311, 21, 10];
+
+    const CRITICAL: bool = false;
+
+    fn value(&self, writer: DERWriter) {
+        writer.write_sequence(|writer| {
+            for policy in self.policies {
+                writer.next().write_sequence(|writer| {
+                    writer
+                        .next()
+                        .write_oid(&ObjectIdentifier::from_slice(policy.as_ref()));
+                });
+            }
+        });
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_certificate_template_der() {
+        let expected = [0x30, 0x4, 0x6, 0x2, 0x2A, 0x3].to_vec();
+        let actual = <CertificateTemplate as Extension>::value(&CertificateTemplate {
+            template_oid: &[1, 2, 3],
+            major_version: None,
+            minor_version: None,
+        });
+        assert_eq!(expected, actual);
+
+        let expected = [
+            0x30, 0x0a, 0x06, 0x02, 0x2a, 0x03, 0x02, 0x01, 0x00, 0x02, 0x01, 0x00,
+        ]
+        .to_vec();
+        let actual = <CertificateTemplate as Extension>::value(&CertificateTemplate {
+            template_oid: &[1, 2, 3],
+            major_version: Some(0),
+            minor_version: Some(0),
+        });
+        assert_eq!(expected, actual);
+    }
+
+    #[test]
+    fn test_application_cert_policies_der() {
+        let policies: &[&[u64]] = &[];
+        let acp = ApplicationCertPolicies { policies };
+        let expected = [0x30, 0x00].to_vec();
+        let actual = <ApplicationCertPolicies<_> as Extension>::value(&acp);
+        assert_eq!(expected, actual);
+    }
+}

@@ -1,0 +1,30 @@
+[package]
+name = "wcce-rs"
+version = "0.1.3"
+authors = ["Lukas Velikov <lukas.velikov@deshaw.com>"]
+edition = "2021"
+description = "Implementation of the [MS-WCCE] certificate enrollment protocol"
+readme = "README.md"
+categories = [
+    "authentication",
+    "cryptography",
+    "encoding",
+    "network-programming",
+]
+
+[dependencies]
+base64 = { version = "0.22.1", default-features = false }
+bcder = { version = "0.7.4", default-features = false }
+cryptographic-message-syntax = { version = "0.27.0", default-features = false, features = [
+    "http",
+] }
+rcgen = { version = "0.13.2", default-features = false, features = [
+    "pem",
+    "crypto",
+    "aws_lc_rs",
+] }
+x509-certificate = { version = "0.24.0", default-features = false }
+yasna = { version = "0.5.2", default-features = false }
+
+[dev-dependencies]
+pretty_assertions = "1.4.1"

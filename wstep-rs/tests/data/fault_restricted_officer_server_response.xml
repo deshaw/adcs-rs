@@ -1,0 +1,25 @@
+<s:Envelope xmlns:s="http://www.w3.org/2003/05/soap-envelope" xmlns:a="http://www.w3.org/2005/08/addressing">
+<s:Header>
+<a:Action s:mustUnderstand="1">http://schemas.microsoft.com/windows/pki/2009/01/enrollment/RequestSecurityTokenCertificateEnrollmentWSDetailFault</a:Action>
+<a:RelatesTo>urn:uuid:95d2dbd8-2caa-4fe3-9bbb-e55d53286290</a:RelatesTo>
+<ActivityId CorrelationId="3d686545-fa56-4353-a949-c3683458f9a7" xmlns="http://schemas.microsoft.com/2004/09/ServiceModel/Diagnostics">95427c83-902c-48db-9529-f61cc1d8c035</ActivityId>
+</s:Header>
+<s:Body>
+<s:Fault>
+<s:Code>
+<s:Value>s:Receiver</s:Value>
+</s:Code>
+<s:Reason>
+<s:Text xml:lang="en-US"/>
+</s:Reason>
+<s:Detail>
+<CertificateEnrollmentWSDetail xmlns="http://schemas.microsoft.com/windows/pki/2009/01/enrollment" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+<BinaryResponse>VkVoV2NsbFlUV2RqTWtZMVkzbENiMkZSUFQwPQ==</BinaryResponse>
+<ErrorCode>-2146877431</ErrorCode>
+<InvalidRequest>true</InvalidRequest>
+<RequestID>28</RequestID>
+</CertificateEnrollmentWSDetail>
+</s:Detail>
+</s:Fault>
+</s:Body>
+</s:Envelope>

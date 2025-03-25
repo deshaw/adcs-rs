@@ -1,0 +1,3 @@
+[workspace]
+members = ["wcce-rs", "wstep-rs", "examples/simple_request"]
+resolver = "2"

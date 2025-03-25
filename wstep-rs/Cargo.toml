@@ -1,0 +1,22 @@
+[package]
+name = "wstep-rs"
+version = "0.1.3"
+authors = ["Lukas Velikov <lukas.velikov@deshaw.com>"]
+edition = "2021"
+description = "Implementation of the [MS-WSTEP] WS-Trust X.509v3 Token Enrollment Extensions protocol"
+readme = "README.md"
+categories = [
+    "authentication",
+    "cryptography",
+    "encoding",
+    "network-programming",
+]
+
+[dependencies]
+serde = { version = "1.0.217", default-features = false, features = ["derive"] }
+quick-xml = { version = "0.37.2", default-features = false, features = [
+    "serialize",
+] }
+
+[dev-dependencies]
+pretty_assertions = "1.4.1"
