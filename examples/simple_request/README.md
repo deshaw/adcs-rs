@@ -103,7 +103,7 @@ Options:
 A truncated example is shown below:
 
 ```console
-cargo run -p simple_request -- \
+$ cargo run -p simple_request -- \
     --csr-key csr_key.key \
     --adcs-ces-uri https://adcs-test.example.org/example-ca-1_CES_Certificate/service.svc/CES \
     --template-oid "2.999.1.2.3" \
