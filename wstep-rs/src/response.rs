@@ -137,7 +137,7 @@ impl<'a> WstepResponse<'a> {
     /// [`Fault`] if the response contains a fault.
     pub const fn requested_token_collection(
         &self,
-    ) -> Result<&RequestSecurityTokenResponseCollection, &Fault> {
+    ) -> Result<&RequestSecurityTokenResponseCollection<'_>, &Fault<'_>> {
         match &self.envelope.body.value {
             ResponseOutcome::Success(collection) => Ok(collection),
             ResponseOutcome::Fault(fault) => Err(fault),
