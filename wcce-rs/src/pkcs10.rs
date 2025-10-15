@@ -1,17 +1,21 @@
-use rcgen::{
-    Attribute as RcgenAttribute, CertificateParams, CertificateSigningRequest as RcgenCsr,
-    CustomExtension as RcgenExtension, ExtendedKeyUsagePurpose, KeyUsagePurpose,
-};
+use rcgen::{ExtendedKeyUsagePurpose, KeyUsagePurpose};
 
 use crate::signing::SigningKey;
 
 /// A PKCS #10 certificate signing request (CSR).
 pub struct CertificateRequest {
-    inner: RcgenCsr,
+    inner: rcgen::CertificateSigningRequest,
 }
 
 impl CertificateRequest {
     /// Start building a new PKCS #10 [`CertificateRequest`].
+    ///
+    /// The subject of the resulting request will be a distinguished name containing
+    /// a single common name (CN) attribute with the value [`CertificateRequestBuilder::DEFAULT_CSR_SUBJECT_CN`].
+    ///
+    /// This is useful for certificate templates that construct their subject from the requester's Active Directory
+    /// attributes (i.e., the template has `Subject Name` > `Supply in the request` unset).
+    /// The placeholder subject is technically required, but will not be used in the signed certificate.
     ///
     /// # Examples
     ///
@@ -28,7 +32,7 @@ impl CertificateRequest {
     /// ```
     #[must_use]
     pub fn builder() -> CertificateRequestBuilder {
-        CertificateRequestBuilder::new()
+        CertificateRequestBuilder::new_with_default_subject()
     }
 
     /// Return the DER-encoded bytes of the underlying request.
@@ -56,15 +60,25 @@ impl std::fmt::Debug for CertificateRequest {
 /// See [`CertificateRequest::builder`] to get started.
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct CertificateRequestBuilder {
-    params: CertificateParams,
-    custom_attributes: Vec<RcgenAttribute>,
+    params: rcgen::CertificateParams,
+    custom_attributes: Vec<rcgen::Attribute>,
 }
 
 impl CertificateRequestBuilder {
-    /// Create a new [`CertificateRequestBuilder`].
-    fn new() -> Self {
+    /// The default common name to be used as the subject of a certificate signing request.
+    pub const DEFAULT_CSR_SUBJECT_CN: &str = "MS-WCCE certificate signing request";
+
+    /// Create a new [`CertificateRequestBuilder`] with a default subject of [`Self::DEFAULT_CSR_SUBJECT_CN`].
+    fn new_with_default_subject() -> Self {
+        // Would use struct expression to override default values, but this type is #[non_exhaustive]
+        let mut params = rcgen::CertificateParams::default();
+        params.distinguished_name = rcgen::DistinguishedName::new();
+        params
+            .distinguished_name
+            .push(rcgen::DnType::CommonName, Self::DEFAULT_CSR_SUBJECT_CN);
+
         Self {
-            params: CertificateParams::default(),
+            params,
             custom_attributes: Vec::new(),
         }
     }
@@ -102,7 +116,7 @@ impl CertificateRequestBuilder {
     /// Add an [`Extension`] to the built request.
     #[must_use]
     pub fn add_extension(mut self, extension: &impl Extension) -> Self {
-        let mut ext = RcgenExtension::from_oid_content(extension.oid(), extension.value());
+        let mut ext = rcgen::CustomExtension::from_oid_content(extension.oid(), extension.value());
         ext.set_criticality(extension.critical());
         self.params.custom_extensions.push(ext);
         self
@@ -111,7 +125,7 @@ impl CertificateRequestBuilder {
     /// Add an [`Attribute`] to the built request.
     #[must_use]
     pub fn add_attribute(mut self, attribute: &impl Attribute) -> Self {
-        self.custom_attributes.push(RcgenAttribute {
+        self.custom_attributes.push(rcgen::Attribute {
             oid: attribute.oid(),
             values: attribute.values(),
         });
