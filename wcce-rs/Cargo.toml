@@ -5,6 +5,10 @@ authors = ["Lukas Velikov <lukas.velikov@deshaw.com>"]
 edition = "2021"
 description = "Implementation of the [MS-WCCE] certificate enrollment protocol"
 readme = "README.md"
+license = "BSD-3-Clause"
+homepage = "https://github.com/deshaw/adcs-rs"
+repository = "https://github.com/deshaw/adcs-rs"
+keywords = ["certificate", "x509", "csr", "signing", "adcs"]
 categories = [
     "authentication",
     "cryptography",
