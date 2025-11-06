@@ -1,5 +1,8 @@
 # `wcce-rs`
 
+![Rust](https://github.com/deshaw/adcs-rs/workflows/Rust/badge.svg)
+[![Crate](https://img.shields.io/crates/v/wcce-rs.svg)](https://crates.io/crates/wcce-rs)
+
 `wcce-rs` is a Rust implementation of the [MS-WCCE] certificate enrollment protocol:
 
 > Specifies the Windows Client Certificate Enrollment Protocol, which consists

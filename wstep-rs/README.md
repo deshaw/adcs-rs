@@ -1,5 +1,8 @@
 # `wstep-rs`
 
+![Rust](https://github.com/deshaw/adcs-rs/workflows/Rust/badge.svg)
+[![Crate](https://img.shields.io/crates/v/wstep-rs.svg)](https://crates.io/crates/wstep-rs)
+
 `wstep-rs` is a Rust implementation of the [MS-WSTEP] WS-Trust X.509v3 Token Enrollment Extensions protocol:
 
 > Specifies the WS-Trust X.509v3 Token Enrollment Extensions, also known as WSTEP.

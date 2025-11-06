@@ -4,6 +4,28 @@
 
 Related projects include [certreq](https://learn.microsoft.com/en-us/windows-server/administration/windows-commands/certreq_1), Windows' certificate request utility, and [Certipy](https://github.com/ly4k/Certipy).
 
+## Crates
+
+The following protocols are supported.
+Each protocol is implemented in its own crate:
+
+| Crate                 | Protocol   | Description                                                                      |                                                                     |                                                                                             |
+| --------------------- | ---------- | -------------------------------------------------------------------------------- | ------------------------------------------------------------------- | ------------------------------------------------------------------------------------------- |
+| [wcce-rs](wcce-rs/)   | [MS-WCCE]  | Rust implementation of the Windows Client Certificate Enrollment Protocol        | ![Rust](https://github.com/deshaw/adcs-rs/workflows/Rust/badge.svg) | [![Crate](https://img.shields.io/crates/v/wcce-rs.svg)](https://crates.io/crates/wcce-rs)   |
+| [wstep-rs](wstep-rs/) | [MS-WSTEP] | Rust implementation of the WS-Trust X.509v3 Token Enrollment Extensions Protocol | ![Rust](https://github.com/deshaw/adcs-rs/workflows/Rust/badge.svg) | [![Crate](https://img.shields.io/crates/v/wstep-rs.svg)](https://crates.io/crates/wstep-rs) |
+
+### Related Protocols
+
+The following list of related protocols have not been implemented by `adcs-rs`.
+This list is non-exhaustive:
+
+| Protocol   | Description                                | Notes                            |
+| ---------- | ------------------------------------------ | -------------------------------- |
+| [MS-CAESO] | Certificate Autoenrollment System Overview | Superset of MS-WCCE and MS-WSTEP |
+| [MS-CRTD]  | Certificate Templates Structure            |                                  |
+| [MS-ICPR]  | ICertPassage Remote Protocol               | Subset of MS-WCCE                |
+| [MS-XCEP]  | Certificate Enrollment Policy Protocol     |                                  |
+
 ## Introduction
 
 From "[What is Active Directory Certificate Services?](https://learn.microsoft.com/en-us/windows-server/identity/ad-cs/active-directory-certificate-services-overview)":
@@ -82,27 +104,7 @@ match parsed_response.requested_token() {
 }
 ```
 
-## Crates
 
-The following protocols are supported.
-Each protocol is implemented in its own crate:
-
-| Crate               | Protocol   | Description                                                                      | Support |
-| ------------------- | ---------- | -------------------------------------------------------------------------------- | ------- |
-| [wcce-rs](wcce-rs/)   | [MS-WCCE]  | Rust implementation of the Windows Client Certificate Enrollment Protocol        | ✔       |
-| [wstep-rs](wstep-rs/) | [MS-WSTEP] | Rust implementation of the WS-Trust X.509v3 Token Enrollment Extensions Protocol | ✔       |
-
-### Related Protocols
-
-The following list of related protocols have not been implemented by `adcs-rs`.
-This list is non-exhaustive:
-
-| Protocol   | Description                                | Notes                            |
-| ---------- | ------------------------------------------ | -------------------------------- |
-| [MS-CAESO] | Certificate Autoenrollment System Overview | Superset of MS-WCCE and MS-WSTEP |
-| [MS-CRTD]  | Certificate Templates Structure            |                                  |
-| [MS-ICPR]  | ICertPassage Remote Protocol               | Subset of MS-WCCE                |
-| [MS-XCEP]  | Certificate Enrollment Policy Protocol     |                                  |
 
 ## Usage
 
